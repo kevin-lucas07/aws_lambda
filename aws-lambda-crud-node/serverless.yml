@@ -1,0 +1,66 @@
+service: aws-lambda-crud-node
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-west-2
+  iamRoleStatements:
+      - Effect: Allow
+        Action:
+        - dynamodb:*
+        Resource:
+        - arn:aws:dynamodb:us-west-2:714014818064:table/PacienteTable
+
+functions:
+  hello:
+    handler: src/index.hello
+    events:
+      - httpApi:
+          path: /
+          method: get
+  createPaciente:
+    handler: src/addPaciente.addPaciente
+    events:
+      - httpApi:
+          path: /pacientes
+          method: post
+
+  getPacientes:
+    handler: src/getPacientes.getPacientes
+    events:
+      - httpApi:
+          path: /pacientes
+          method: get
+
+  getPaciente:
+    handler: src/getPaciente.getPaciente
+    events:
+      - httpApi:
+          path: /pacientes/{id}
+          method: get
+  updatePaciente:
+    handler: src/updatePaciente.updatePaciente
+    events:
+      - httpApi:
+          path: /pacientes/{id}
+          method: put
+  deletePaciente:
+    handler: src/deletePaciente.deletePaciente
+    events:
+      - httpApi:
+          path: /pacientes/{id}
+          method: delete
+resources:
+  Resources:
+    PacienteTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: PacienteTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
